@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 (http://www.altova.com) by TEAM ViRiLiTY (VRL) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:opi="http://www.mildu.info" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!--
+added since version 0.0.8:
+add new attribute of ninegrid and onegrid:opacity,border,backgroundimage
+tooltip of onegrid
+add cmetro
+
+changed on 11.22.2011
+change aui->control, add directedui；add adatatypelink
+change adatamodel,separate adata into two parts: simple type and complex type
+change cdatamodel,add new cdata type: cbinary, cbool, cenumarator, cdatetime
+
+changed since version 0.0.10:
+change root node from cuidl to E-UIDL
+
+changed since version 0.0.11:
+added weight and order to auibasetype
+adata需要仔细考虑，当前只区分了简单数据类型与复杂数据类型
+
+changed since version 0.0.12 on 20120327:
+这次是大变化。
+1.给根节点、uidlheader添加了inherit属性，用来更好地支持各个模块之间的复用
+2.添加了um2模块(用户模型)，该模块主要为配合um2那篇文章，用以实现通过用户模型，
+来推荐合适界面的工作。暂时未实现，需要注意其中annotation.
+TODO:需要实现um2的描述
+-->
+	<xs:element name="E-UIDL">
+		<xs:annotation>
+			<xs:documentation>Common User Interface Description Language</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="AFUI" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="CUI" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ADATAMODEL" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="CDATAMODEL" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="MAPPING" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="RESOURCE" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:string" use="required"/>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="desc" type="xs:string" use="optional"/>
+			<xs:attribute name="date" type="xs:string" use="optional"/>
+			<xs:attribute name="version" type="xs:string" use="required" fixed="0.0.12"/>
+			<xs:attribute name="inheritfrom">
+				<xs:annotation>
+					<xs:documentation>为了实现语言一级的继承功能</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="uidlheader">
+		<xs:attribute name="id" type="xs:string" use="required"/>
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+		<xs:attribute name="desc" type="xs:string" use="optional"/>
+		<xs:attribute name="inheritfrom">
+			<xs:annotation>
+				<xs:documentation>为使得各个模块有继承功能，添加该字段，允许继承。这项功能在CUI的自适应用户界面的描述中很有帮助。注意，数据的服用以append为主，而界面的复用则以replace为主。</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:element name="AFUI">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="uidlheader">
+					<xs:sequence maxOccurs="unbounded">
+						<xs:element ref="group"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CUI">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="uidlheader">
+					<xs:choice maxOccurs="unbounded">
+						<xs:element ref="cninegrid">
+							<xs:annotation>
+								<xs:documentation>mobile or pui</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="cmetro"/>
+						<xs:element ref="cpaper">
+							<xs:annotation>
+								<xs:documentation>pui</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="cframe">
+							<xs:annotation>
+								<xs:documentation>pui</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="clayout">
+							<xs:annotation>
+								<xs:documentation>布局</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="ctabbedpane"/>
+						<xs:element ref="cscrollpane"/>
+						<xs:element ref="cicon"/>
+						<xs:element ref="cbutton"/>
+						<xs:element ref="clistview"/>
+						<xs:element ref="ccustomized"/>
+						<xs:element ref="cpart">
+							<xs:annotation>
+								<xs:documentation>一个界面</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ADATAMODEL">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="uidlheader">
+					<xs:sequence maxOccurs="unbounded">
+						<xs:element ref="adata"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CDATAMODEL">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="uidlheader">
+					<xs:sequence maxOccurs="unbounded">
+						<xs:element ref="cdata"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MAPPING">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="uidlheader">
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="mappingdata"/>
+						<xs:element ref="afui2adata"/>
+						<xs:element ref="cui2cdata"/>
+						<xs:element ref="cui2afui"/>
+						<xs:element ref="afui2cui"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CONTEXT">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="uidlheader"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RESOURCE">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="uidlheader">
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="reselement"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<!--aui base 抽象界面描述-->
+	<xs:complexType name="auibaseType">
+		<xs:attribute name="id" use="required"/>
+		<xs:attribute name="name"/>
+		<xs:attribute name="desc"/>
+		<xs:attribute name="datatype"/>
+		<xs:attribute name="weightType" type="weightType" use="optional" default="notDefined"/>
+		<xs:attribute name="weight" type="xs:integer">
+			<xs:annotation>
+				<xs:documentation>当type类型为customized时，weight不为空</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="hasOrder" type="xs:boolean" use="optional" default="true"/>
+		<xs:attribute name="orderIndex" type="xs:integer" use="optional">
+			<xs:annotation>
+				<xs:documentation>一般来说，当hasOrder为true时，该值不为空；否则使用默认顺序</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:simpleType name="weightType">
+		<xs:annotation>
+			<xs:documentation>组元素权值类型</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="singleCenter|doubleCenter|fair|customized|notDefined"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="group">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="auibaseType">
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="group" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="atomgroup" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="input" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="output" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="control" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="atomgroup">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="auibaseType">
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="input" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="output" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="control" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="input">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="auibaseType">
+					<xs:attribute name="adatatypelink"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="output">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="auibaseType">
+					<xs:attribute name="adatatypelink"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="control">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="auibaseType">
+					<xs:attribute name="directedui">
+						<xs:annotation>
+							<xs:documentation>控件重定向的ui的id</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="adatatypelink">
+						<xs:annotation>
+							<xs:documentation>数据类型对应的链接</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<!--cui base 具体界面描述-->
+	<xs:complexType name="cuibaseType">
+		<xs:attribute name="id" use="required"/>
+		<xs:attribute name="name"/>
+		<xs:attribute name="desc"/>
+		<xs:attribute name="isentranceui" type="xs:boolean" default="false"/>
+	</xs:complexType>
+	<xs:element name="cuiaddon">
+		<xs:complexType>
+			<xs:attribute name="addonid" use="required">
+				<xs:annotation>
+					<xs:documentation>附加属性名称</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="addonname"/>
+			<xs:attribute name="addonvalue"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cuichild">
+		<xs:complexType>
+			<xs:attribute name="childid" use="required">
+				<xs:annotation>
+					<xs:documentation>链接的子控件</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="childname"/>
+			<xs:attribute name="childvalue"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cpart">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cuibaseType">
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="cuiaddon"/>
+						<xs:element ref="cuichild"/>
+					</xs:choice>
+					<xs:attribute name="startx" type="xs:integer"/>
+					<xs:attribute name="starty" type="xs:integer"/>
+					<xs:attribute name="width" type="xs:integer"/>
+					<xs:attribute name="height" type="xs:integer"/>
+					<xs:attribute name="background" type="xs:string" use="optional"/>
+					<xs:attribute name="foreground" type="xs:string" use="optional"/>
+					<xs:attribute name="isfullscreen" type="xs:boolean"/>
+					<xs:attribute name="layout" type="xs:string" use="optional">
+						<xs:annotation>
+							<xs:documentation>使用id与layout实例链接</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cpaper">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cuibaseType">
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="cuiaddon"/>
+						<xs:element ref="cuichild"/>
+					</xs:choice>
+					<xs:attribute name="startx" type="xs:integer"/>
+					<xs:attribute name="starty" type="xs:integer"/>
+					<xs:attribute name="width" type="xs:integer"/>
+					<xs:attribute name="height" type="xs:integer"/>
+					<xs:attribute name="background" type="xs:string" use="optional"/>
+					<xs:attribute name="foreground" type="xs:string" use="optional"/>
+					<xs:attribute name="layout" type="xs:string" use="optional">
+						<xs:annotation>
+							<xs:documentation>使用id与layout实例链接</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="isfullscreen" type="xs:boolean"/>
+					<xs:attribute name="linable" type="xs:boolean" use="optional"/>
+					<xs:attribute name="linecount" type="xs:integer" use="optional"/>
+					<xs:attribute name="strokevisible"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cframe">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cuibaseType">
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="cuiaddon"/>
+						<xs:element ref="cuichild"/>
+					</xs:choice>
+					<xs:attribute name="startx" type="xs:integer"/>
+					<xs:attribute name="starty" type="xs:integer"/>
+					<xs:attribute name="width" type="xs:integer"/>
+					<xs:attribute name="height" type="xs:integer"/>
+					<xs:attribute name="background" type="xs:string" use="optional"/>
+					<xs:attribute name="foreground" type="xs:string" use="optional"/>
+					<xs:attribute name="layout" type="xs:string" use="optional">
+						<xs:annotation>
+							<xs:documentation>使用id与layout实例链接</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cicon">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cuibaseType">
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="cuiaddon"/>
+					</xs:sequence>
+					<xs:attribute name="startx" type="xs:integer"/>
+					<xs:attribute name="starty" type="xs:integer"/>
+					<xs:attribute name="width" type="xs:integer"/>
+					<xs:attribute name="height" type="xs:integer"/>
+					<xs:attribute name="background" type="xs:string" use="optional"/>
+					<xs:attribute name="foreground" type="xs:string" use="optional"/>
+					<xs:attribute name="res" use="required"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cbutton">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cuibaseType">
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="cuiaddon"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="clistview">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cuibaseType">
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="cuiaddon"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ccombobox">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cuibaseType">
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="cuiaddon"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cscrollpane">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cuibaseType">
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="cuiaddon"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ctabbedpane">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cuibaseType">
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="cuiaddon"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="clayout">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cuibaseType">
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="cuiaddon"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ccustomized">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cuibaseType">
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="cuiaddon"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cninegrid">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cuibaseType">
+					<xs:sequence>
+						<xs:element ref="cuiaddon" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="onegrid" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+					<xs:attribute name="rownumber" type="xs:integer" default="3"/>
+					<xs:attribute name="colnumber" type="xs:integer" default="3"/>
+					<xs:attribute name="hgap" type="xs:integer" default="0"/>
+					<xs:attribute name="vgap" type="xs:integer" default="0"/>
+					<xs:attribute name="isfullscreen" type="xs:boolean" default="false"/>
+					<xs:attribute name="width" type="xs:integer"/>
+					<xs:attribute name="height" type="xs:integer"/>
+					<xs:attribute name="opacity" type="xs:integer"/>
+					<xs:attribute name="bgimage" type="xs:string"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cmetro">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cuibaseType">
+					<xs:sequence>
+						<xs:element ref="onemetrogrid" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="cuiaddon" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="onegrid">
+		<xs:complexType>
+			<xs:attribute name="gridindex"/>
+			<xs:attribute name="gridicon"/>
+			<xs:attribute name="gridtype" type="gridtypevalue"/>
+			<xs:attribute name="gridlink"/>
+			<xs:attribute name="opacity" type="xs:integer"/>
+			<xs:attribute name="border" type="xs:integer"/>
+			<xs:attribute name="tooltip" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="onemetrogrid">
+		<xs:complexType>
+			<xs:attribute name="gridindex"/>
+			<xs:attribute name="gridicon"/>
+			<xs:attribute name="gridtype" type="gridtypevalue"/>
+			<xs:attribute name="gridlink"/>
+			<xs:attribute name="opacity" type="xs:integer"/>
+			<xs:attribute name="border" type="xs:integer"/>
+			<xs:attribute name="x" type="xs:integer"/>
+			<xs:attribute name="y" type="xs:integer"/>
+			<xs:attribute name="width" type="xs:integer"/>
+			<xs:attribute name="height" type="xs:integer"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="gridtypevalue">
+		<xs:annotation>
+			<xs:documentation>九宫格每一个格子的类型值</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="linkedapp|linkedgrid|linkedui|linkednull"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--abstract data 抽象数据描述-->
+	<xs:complexType name="adatasimpletype">
+		<xs:attribute name="id" type="xs:string" use="required"/>
+		<xs:attribute name="desc"/>
+		<xs:attribute name="typevalue" type="adatasimplevalue"/>
+	</xs:complexType>
+	<xs:complexType name="adatacomplextype">
+		<xs:attribute name="id" type="xs:string" use="required"/>
+		<xs:attribute name="desc"/>
+		<xs:attribute name="typevalue" type="adatacomplexvalue"/>
+	</xs:complexType>
+	<xs:simpleType name="adatasimplevalue">
+		<xs:annotation>
+			<xs:documentation>抽象数据简单类型值</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="singlevalue|int|float|bool|binary|enum|date|customized"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="adatacomplexvalue">
+		<xs:annotation>
+			<xs:documentation>抽象数据复杂类型值</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="list|table"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="adata">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="adatasimpleitem">
+					<xs:complexType>
+						<xs:complexContent>
+							<xs:extension base="adatasimpletype">
+								<xs:attribute name="value"/>
+							</xs:extension>
+						</xs:complexContent>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="adatacomplexitem">
+					<xs:complexType>
+						<xs:complexContent>
+							<xs:extension base="adatacomplextype">
+								<xs:attribute name="value"/>
+							</xs:extension>
+						</xs:complexContent>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<!--concrete data 具体数据描述-->
+	<xs:element name="cdata">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="cbinary"/>
+				<xs:element ref="cbool"/>
+				<xs:element ref="cenumerated"/>
+				<xs:element ref="cint"/>
+				<xs:element ref="cfloat"/>
+				<xs:element ref="cstring"/>
+				<xs:element ref="clist"/>
+				<xs:element ref="ctable"/>
+				<xs:element ref="cdatetime"/>
+			</xs:choice>
+			<xs:attribute name="id"/>
+			<xs:attribute name="name"/>
+			<xs:attribute name="desc"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cbinary">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:restriction base="cdatadescription">
+					<xs:attribute name="id"/>
+					<xs:attribute name="name"/>
+					<xs:attribute name="desc"/>
+					<xs:attribute name="source" type="cdatasourcetypevalue" use="required"/>
+					<xs:attribute name="isfixed" use="required"/>
+					<xs:attribute name="value" use="required"/>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cbool">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:restriction base="cdatadescription">
+					<xs:attribute name="id"/>
+					<xs:attribute name="name"/>
+					<xs:attribute name="desc"/>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cenumerated">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:restriction base="cdatadescription">
+					<xs:attribute name="id"/>
+					<xs:attribute name="name"/>
+					<xs:attribute name="desc"/>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cint">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:restriction base="cdatadescription">
+					<xs:attribute name="id"/>
+					<xs:attribute name="name"/>
+					<xs:attribute name="desc"/>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cfloat">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:restriction base="cdatadescription">
+					<xs:attribute name="id"/>
+					<xs:attribute name="name"/>
+					<xs:attribute name="desc"/>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cstring">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:restriction base="cdatadescription">
+					<xs:attribute name="id"/>
+					<xs:attribute name="name"/>
+					<xs:attribute name="desc"/>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cdatetime">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:restriction base="cdatadescription">
+					<xs:attribute name="id"/>
+					<xs:attribute name="name"/>
+					<xs:attribute name="desc"/>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="clist">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:restriction base="cdatadescription">
+					<xs:attribute name="id"/>
+					<xs:attribute name="name"/>
+					<xs:attribute name="desc"/>
+					<xs:attribute name="source" type="cdatasourcetypevalue" use="required"/>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ctable">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:restriction base="cdatadescription">
+					<xs:attribute name="id"/>
+					<xs:attribute name="name"/>
+					<xs:attribute name="desc"/>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="cdatadescription">
+		<xs:attribute name="id"/>
+		<xs:attribute name="name"/>
+		<xs:attribute name="desc"/>
+		<xs:attribute name="source" type="cdatasourcetypevalue" use="required"/>
+		<xs:attribute name="isfixed" use="required"/>
+		<xs:attribute name="value" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="cdatasourcetypevalue">
+		<xs:annotation>
+			<xs:documentation>数据来源类型,inline属于fixed，另外两个属于unfixed</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="inline|database|file"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--mapping 映射关系-->
+	<xs:element name="mappingdata">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="mappingitem"/>
+			</xs:sequence>
+			<xs:attribute name="id" use="required"/>
+			<xs:attribute name="name"/>
+			<xs:attribute name="desc"/>
+			<xs:attribute name="mappingtype" type="mappingtypevalue"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="afui2adata">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="mappingitem"/>
+			</xs:sequence>
+			<xs:attribute name="id" use="required"/>
+			<xs:attribute name="name"/>
+			<xs:attribute name="desc"/>
+			<xs:attribute name="mappingtype" type="mappingtypevalue"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="afui2cdata">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="mappingitem"/>
+			</xs:sequence>
+			<xs:attribute name="id" use="required"/>
+			<xs:attribute name="name"/>
+			<xs:attribute name="desc"/>
+			<xs:attribute name="mappingtype" type="mappingtypevalue"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cui2cdata">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="mappingitem"/>
+			</xs:sequence>
+			<xs:attribute name="id" use="required"/>
+			<xs:attribute name="name"/>
+			<xs:attribute name="desc"/>
+			<xs:attribute name="mappingtype" type="mappingtypevalue"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cui2afui">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="mappingitem"/>
+			</xs:sequence>
+			<xs:attribute name="id" use="required"/>
+			<xs:attribute name="name"/>
+			<xs:attribute name="desc"/>
+			<xs:attribute name="mappingtype" type="mappingtypevalue"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="afui2cui">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="mappingitem"/>
+			</xs:sequence>
+			<xs:attribute name="id" use="required"/>
+			<xs:attribute name="name"/>
+			<xs:attribute name="desc"/>
+			<xs:attribute name="mappingtype" type="mappingtypevalue"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="mappingitem">
+		<xs:complexType>
+			<xs:attribute name="fromid" use="required"/>
+			<xs:attribute name="toid" use="required"/>
+			<xs:attribute name="mappingitemtype"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="mappingtypevalue">
+		<xs:annotation>
+			<xs:documentation>映射类型值</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="afui2cui|cui2aui|afui2adata|cui2cdata|cui2adata|resimage|afui2cdata"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--resource element-->
+	<xs:element name="reselement">
+		<xs:complexType>
+			<xs:attribute name="id" use="required"/>
+			<xs:attribute name="path" use="required"/>
+			<xs:attribute name="desc"/>
+		</xs:complexType>
+	</xs:element>
+	<!--um2 element-->
+	<xs:element name="um2">
+		<xs:annotation>
+			<xs:documentation>这一个是用户模型，主要为实现自适应用户界面而定义的模块。一个问题是，其实用户模型是一个自学习的过程，其学习的结果是一个更新过的用户模型，这个用户模型应该能够被反写回UIDL。所以在设计这个模块的时候，应该特别注意，该模块的很多部分应该都是一个范围，而不是一个孤立的值，</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="id" use="required"/>
+			<xs:attribute name="desc"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
